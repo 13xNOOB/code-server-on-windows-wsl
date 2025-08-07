@@ -1,99 +1,245 @@
-🧾 **Documentation: Setting Up code-server on Windows 11 Using WSL**
+## 📋 Documentation: Setting Up code-server on Windows 11 Using WSL
 
-📌 Goal
+## 📚 Table of Contents
+
+* [📌 Goal](#-goal)
+* [🛠️ Step 1: Initial Attempt – Using the Prebuilt .zip File](#-step-1-initial-attempt--using-the-prebuilt-zip-file)
+* [🛠️ Step 2: Setting Up WSL on Windows 11](#-step-2-setting-up-wsl-on-windows-11)
+* [🧱 Step 3: Installing code-server in WSL (Ubuntu)](#-step-3-installing-code-server-in-wsl-ubuntu-and-running-it-for-the-first-time)
+* [🧱 Step 4: Configuring Windows Firewall Port](#-step-4-configuring-windows-firewall-port)
+* [🧱 Step 5: PowerShell Script Setup](#-step-5-windows-powershell-script-to-get-wsl-ip-and-updates-the-portproxy-rule-automatically)
+* [🧱 Step 6: Start code-server in WSL](#-step-6-start-code-server-in-wsl)
+* [🧱 Step 7: Manual Alternative If Script Fails](#-step-7-alternatively-if-the-script-does-not-work-do-the-following)
+* [📝 Final Summary](#-final-summary)
+
+---
+
+## 📌 Goal
+
 To use Visual Studio Code (VS Code) on an iPad by running code-server (a web-accessible version of VS Code) on a local Windows 11 laptop.
-🛠️ Step 1: Initial Attempt – Using the Prebuilt .zip File
-🔍 Actions Taken
-Visited the official code-server GitHub repository.
 
-Downloaded the prebuilt release .zip file for Windows.
+---
 
-Extracted the contents.
+## 🛠️ Step 1: Initial Attempt – Using the Prebuilt .zip File
 
-❌ Issue Faced
-Upon running the executable from the zip, it showed:
+### 🔍 Actions Taken
 
-Error: There was no executable to run from the .zip I downloaded. There was no clear path to success.
+* Visited the official code-server GitHub repository.
+* Downloaded the prebuilt release `.zip` file for Windows.
+* Extracted the contents.
 
-💡 Decision
-Switched to using WSL (Windows Subsystem for Linux) for better compatibility and Unix-like environment because I am using a home version of windows 11(Remote desktop is not available in the home edition of windows). 
+### ❌ Issue Faced
 
-🛠️ Step 2: Setting Up WSL on Windows 11
-✅ Steps Completed
-1. Enabled WSL feature:
+Running the executable failed with the error:
 
+> There was no executable to run from the .zip I downloaded.
+
+### 💡 Decision
+
+Switched to using **Windows Subsystem for Linux (WSL)** for better compatibility and a Unix-like environment.
+
+---
+
+## 🛠️ Step 2: Setting Up WSL on Windows 11
+
+```bash
 wsl --install
+```
 
-This downloads and installs WSL for windows. 
+* After installation, go to the Microsoft Store and install:
 
-2. After download and install was completed I went to the microsoft store and downloaded and installed  Ubuntu 24.04.1 LTS
-3. Confirmed installation via:
-   wsl --list --verbose
+  > **Ubuntu 24.04.1 LTS**
 
-🧱 Step 3: Installing code-server in WSL (Ubuntu) and running it for the first time
-1. Opened Ubuntu terminal in WSL by opening terminal and typing "wsl".
-2. This prompted me to set up my user and password for ubuntu. The password inserted here is extremely important because the password is later used for any sudo operations.
-3. sudo apt update && sudo apt upgrade -y
-4. curl -fsSL https://code-server.dev/install.sh | sh
-5. code-server 
+```bash
+wsl --list --verbose
+```
 
-🧱 Step 4: Configuring Windows Firewall port 
-1. Make code-server accessible on my network
-   a. nano ~/.config/code-server/config.yaml
-   b. Change:
-     bind-addr: 127.0.0.1:8080
-     to
-     bind-addr: 0.0.0.0:8080
-   c. ctrl+x
-   d. y
-2. Restart code-server in terminal
-3. Find WSL IP
-   a. Still in Ubuntu/WSL, run:
-     hostname -I
-     I got: 172.18.202.206
-   b. In a browser in the same pc run: 172.18.202.206:8080
-   c. I got access to VS code and was asked to insert password here.
-      The password can be found by running: cat ~/.config/code-server/config.yaml
-4. Allow Port 8080 Through Windows Firewall
-   a. Open Windows Defender Firewall
-   b. Click on "Advanced Settings" (on the left)
-   c. Go to Inbound Rules → click New Rule (right panel)
-   d. Choose Port → Click Next
-   e. Select TCP, and Specific local ports: 8080
-   f. Click Next, choose Allow the connection
-   g. Click Next, make sure Private is checked (for home Wi-Fi)
-   h. I gave it the name: code-server WSL
-   i. click Finish
+---
 
+## 🧱 Step 3: Installing code-server in WSL (Ubuntu) and Running It
 
-6. I then disabled the password to access VS code
-   a. nano ~/.config/code-server/config.yaml
-   b. Change:
-     auth: password
-     to
-     auth: none
-   c. Save(ctrl+x, y) and restart code-server
+```bash
+# Update & upgrade packages
+sudo apt update && sudo apt upgrade -y
 
-🧱 Step 5: Windows PowerShell script to get WSL IP and Updates the portproxy rule automatically
-1. Download the Update-CodeServer-PortProxy.ps1 file in this repo to desktop
+# Install code-server
+curl -fsSL https://code-server.dev/install.sh | sh
 
+# Start code-server
+code-server
+```
 
-🧱 Step 6: Start code-server in WSL
-1. On each startup run powershell as administrator and open wsl
-2. code-server --host 0.0.0.0 --port 8080
-3. On a new powershell as administrator
-   a. cd .\Desktop\
-   b. Run .\Update-CodeServer-PortProxy.ps1
-4. In my iPad, i go to:
-  http://192.168.0.213:8080
+<details>
+<summary>⚠️ Initial WSL Setup Notes</summary>
 
-🧱 Step 7: Alternatively if the script does not work, do the following:
-1.  In a wsl terminal I need to run:
-  code-server --host 0.0.0.0 --port 8080
-2. netsh interface portproxy add v4tov4 listenport=8080 listenaddress=0.0.0.0 connectport=8080 connectaddress=172.18.202.206
-3. In my iPad, i go to:
-  http://192.168.0.213:8080
+* When Ubuntu is first launched, you'll be asked to set a username and password.
+* This password is required for all `sudo` commands.
 
-   
+</details>
 
+---
 
+## 🧱 Step 4: Configuring Windows Firewall Port
+
+### 1. Update `config.yaml`
+
+```bash
+nano ~/.config/code-server/config.yaml
+```
+
+Change:
+
+```yaml
+bind-addr: 127.0.0.1:8080
+```
+
+to:
+
+```yaml
+bind-addr: 0.0.0.0:8080
+```
+
+Then press `Ctrl+X`, then `Y`, and press `Enter` to save.
+
+### 2. Restart code-server
+
+```bash
+code-server
+```
+
+### 3. Get WSL IP
+
+```bash
+hostname -I
+```
+
+Then access it in a browser on the same PC:
+
+```text
+http://<WSL-IP>:8080
+```
+
+### 4. Find the default password
+
+```bash
+cat ~/.config/code-server/config.yaml
+```
+
+### 5. Allow Port 8080 Through Windows Firewall
+
+1. Open **Windows Defender Firewall**
+2. Go to **Advanced Settings** (left panel)
+3. Click **Inbound Rules** → **New Rule** (right panel)
+4. Choose **Port** → **Next**
+5. Select **TCP** and set Specific local ports: `8080`
+6. Choose **Allow the connection**
+7. Ensure **Private** is checked
+8. Name it: `code-server WSL`
+9. Click **Finish**
+
+### 6. Disable Password Authentication (optional)
+
+```bash
+nano ~/.config/code-server/config.yaml
+```
+
+Change:
+
+```yaml
+auth: password
+```
+
+to:
+
+```yaml
+auth: none
+```
+
+Then restart code-server:
+
+```bash
+code-server
+```
+
+---
+
+## 🧱 Step 5: Windows PowerShell Script Setup
+
+Download the `Update-CodeServer-PortProxy.ps1` file from this repo to your **Desktop**.
+
+---
+
+## 🧱 Step 6: Start code-server in WSL
+
+### 1. Run code-server in WSL
+
+```bash
+code-server --host 0.0.0.0 --port 8080
+```
+
+### 2. In **PowerShell as Administrator**
+
+```powershell
+cd .\Desktop\
+.\u005cUpdate-CodeServer-PortProxy.ps1
+```
+
+### 3. On iPad, access your Windows LAN IP
+
+```text
+http://192.168.0.213:8080
+```
+
+<details>
+<summary>⚠️ Note on IP Changes</summary>
+
+* **WSL IP and LAN IP may change** after reboot or network change.
+* You must re-run the script to refresh the `portproxy` rule.
+
+</details>
+
+---
+
+## 🧱 Step 7: Alternatively If Script Fails
+
+### 1. In WSL Terminal
+
+```bash
+code-server --host 0.0.0.0 --port 8080
+```
+
+### 2. In PowerShell as Administrator
+
+```powershell
+netsh interface portproxy add v4tov4 listenport=8080 listenaddress=0.0.0.0 connectport=8080 connectaddress=172.18.202.206
+```
+
+### 3. On iPad:
+
+```text
+http://192.168.0.213:8080
+```
+
+<details>
+<summary>💡 Notes</summary>
+
+* Replace the IPs as per your WSL and LAN addresses.
+* You can get your WSL IP by running:
+
+```bash
+hostname -I
+```
+
+</details>
+
+---
+
+## 📝 Final Summary
+
+* You've set up a local code-server instance running on WSL.
+* It's accessible from your iPad over your local network.
+* You’ve made it easier to start the server with a PowerShell automation script.
+* Optional password disabling improves UX on trusted networks.
+* Always remember to check WSL and LAN IPs after reboots/network changes.
+
+Enjoy running VS Code from anywhere on your iPad! 🚀
