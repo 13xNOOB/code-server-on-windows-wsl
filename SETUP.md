@@ -84,6 +84,12 @@ This downloads and installs WSL for windows.
 2. In my iPad, i go to:
   http://192.168.0.213:8080
 
+🧱 Step 7: Alternatively if the script does not work, do the following:
+1.  In a wsl terminal I need to run:
+  code-server --host 0.0.0.0 --port 8080
+2. netsh interface portproxy add v4tov4 listenport=8080 listenaddress=0.0.0.0 connectport=8080 connectaddress=172.18.202.206
+3. In my iPad, i go to:
+  http://192.168.0.213:8080
 
    
 
