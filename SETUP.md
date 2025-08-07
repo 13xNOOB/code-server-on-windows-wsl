@@ -181,7 +181,7 @@ code-server --host 0.0.0.0 --port 8080
 
 ```powershell
 cd .\Desktop\
-.\u005cUpdate-CodeServer-PortProxy.ps1
+.\Update-CodeServer-PortProxy.ps1
 ```
 
 ### 3. On iPad, access your Windows LAN IP
