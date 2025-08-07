@@ -1,4 +1,5 @@
-🧾 Documentation: Setting Up code-server on Windows 11 Using WSL
+🧾 **Documentation: Setting Up code-server on Windows 11 Using WSL**
+
 📌 Goal
 To use Visual Studio Code (VS Code) on an iPad by running code-server (a web-accessible version of VS Code) on a local Windows 11 laptop.
 🛠️ Step 1: Initial Attempt – Using the Prebuilt .zip File
@@ -78,10 +79,12 @@ This downloads and installs WSL for windows.
 
 
 🧱 Step 6: Start code-server in WSL
-1. On each startup run powershell as administrator
+1. On each startup run powershell as administrator and open wsl
+2. code-server --host 0.0.0.0 --port 8080
+3. On a new powershell as administrator
    a. cd .\Desktop\
    b. Run .\Update-CodeServer-PortProxy.ps1
-2. In my iPad, i go to:
+4. In my iPad, i go to:
   http://192.168.0.213:8080
 
 🧱 Step 7: Alternatively if the script does not work, do the following:
